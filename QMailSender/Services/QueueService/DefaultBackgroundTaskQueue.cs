@@ -18,10 +18,7 @@ public sealed class DefaultBackgroundTaskQueue : IBackgroundTaskQueue
     public async ValueTask QueueBackgroundWorkItemAsync(
         Func<CancellationToken, ValueTask> workItem)
     {
-        if (workItem is null)
-        {
-            throw new ArgumentNullException(nameof(workItem));
-        }
+        if (workItem is null) throw new ArgumentNullException(nameof(workItem));
 
         await _queue.Writer.WriteAsync(workItem);
     }
@@ -29,7 +26,7 @@ public sealed class DefaultBackgroundTaskQueue : IBackgroundTaskQueue
     public async ValueTask<Func<CancellationToken, ValueTask>> DequeueAsync(
         CancellationToken cancellationToken)
     {
-        Func<CancellationToken, ValueTask>? workItem =
+        var workItem =
             await _queue.Reader.ReadAsync(cancellationToken);
 
         return workItem;

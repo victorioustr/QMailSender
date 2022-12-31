@@ -1,7 +1,7 @@
-namespace QMailSender.Helpers;
-
 using System.Net;
 using System.Text.Json;
+
+namespace QMailSender.Helpers;
 
 public class ErrorHandlerMiddleware
 {
@@ -23,7 +23,7 @@ public class ErrorHandlerMiddleware
             var response = context.Response;
             response.ContentType = "application/json";
 
-            switch(error)
+            switch (error)
             {
                 case AppException e:
                     // custom application error

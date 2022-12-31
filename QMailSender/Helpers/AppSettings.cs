@@ -11,5 +11,4 @@ public class AppSettings
     public string DefaultPassword { get; set; }
     public string DefaultFirstName { get; set; }
     public string DefaultLastName { get; set; }
-
 }

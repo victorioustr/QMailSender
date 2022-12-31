@@ -1,17 +1,16 @@
+using Microsoft.AspNetCore.Mvc;
 using QMailSender.Authorization;
 using QMailSender.Models.Users;
 using QMailSender.Services;
 
 namespace QMailSender.Controllers;
 
-using Microsoft.AspNetCore.Mvc;
-
 [Authorize]
 [ApiController]
 [Route("[controller]")]
 public class UsersController : ControllerBase
 {
-    private IUserService _userService;
+    private readonly IUserService _userService;
 
     public UsersController(IUserService userService)
     {
@@ -89,7 +88,6 @@ public class UsersController : ControllerBase
         // get source ip address for the current request
         if (Request.Headers.ContainsKey("X-Forwarded-For"))
             return Request.Headers["X-Forwarded-For"];
-        else
-            return HttpContext.Connection.RemoteIpAddress.MapToIPv4().ToString();
+        return HttpContext.Connection.RemoteIpAddress.MapToIPv4().ToString();
     }
 }

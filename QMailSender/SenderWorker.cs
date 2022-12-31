@@ -8,10 +8,10 @@ namespace QMailSender;
 
 public class SenderWorker : BackgroundService
 {
-    private readonly IBackgroundTaskQueue _taskQueue;
-    private readonly ILogger<SenderWorker> _logger;
     private readonly DataContext _context;
+    private readonly ILogger<SenderWorker> _logger;
     private readonly IMediator _mediator;
+    private readonly IBackgroundTaskQueue _taskQueue;
 
     public SenderWorker(IBackgroundTaskQueue taskQueue, ILogger<SenderWorker> logger,
         IServiceScopeFactory serviceScopeFactory)
@@ -42,10 +42,9 @@ public class SenderWorker : BackgroundService
     private async Task ProcessTaskQueueAsync(CancellationToken stoppingToken)
     {
         while (!stoppingToken.IsCancellationRequested)
-        {
             try
             {
-                Func<CancellationToken, ValueTask>? workItem =
+                var workItem =
                     await _taskQueue.DequeueAsync(stoppingToken);
 
                 await workItem(stoppingToken);
@@ -58,7 +57,6 @@ public class SenderWorker : BackgroundService
             {
                 _logger.LogError(ex, "Error occurred executing task work item.");
             }
-        }
     }
 
     public override async Task StopAsync(CancellationToken stoppingToken)

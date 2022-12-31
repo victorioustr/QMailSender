@@ -1,5 +1,4 @@
 using MediatR;
-using Microsoft.Build.Logging;
 using Microsoft.EntityFrameworkCore;
 using QMailSender.Entities;
 using QMailSender.Handlers.Abstract;
@@ -24,7 +23,7 @@ public class GetJobStatusQuery : IRequest<IDataResult<Job>>
         {
             var result = await _context.Jobs
                 .Include(i => i.JobMembers)
-                .FirstOrDefaultAsync(w => w.Id == request.Id, cancellationToken: cancellationToken);
+                .FirstOrDefaultAsync(w => w.Id == request.Id, cancellationToken);
 
             return new DataResult<Job>(result ?? throw new BadHttpRequestException(nameof(Job)), true);
         }

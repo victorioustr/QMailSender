@@ -1,14 +1,13 @@
-using QMailSender.Entities;
-using QMailSender.Helpers;
-
-namespace QMailSender.Authorization;
-
-using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
+using QMailSender.Entities;
+using QMailSender.Helpers;
+
+namespace QMailSender.Authorization;
 
 public interface IJwtUtils
 {
@@ -19,8 +18,8 @@ public interface IJwtUtils
 
 public class JwtUtils : IJwtUtils
 {
-    private DataContext _context;
     private readonly AppSettings _appSettings;
+    private readonly DataContext _context;
 
     public JwtUtils(
         DataContext context,
@@ -39,7 +38,8 @@ public class JwtUtils : IJwtUtils
         {
             Subject = new ClaimsIdentity(new[] { new Claim("id", user.Id.ToString()) }),
             Expires = DateTime.UtcNow.AddMinutes(15),
-            SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+            SigningCredentials =
+                new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
         };
         var token = tokenHandler.CreateToken(tokenDescriptor);
         return tokenHandler.WriteToken(token);
@@ -62,7 +62,7 @@ public class JwtUtils : IJwtUtils
                 ValidateAudience = false,
                 // set clockskew to zero so tokens expire exactly at token expiration time (instead of 5 minutes later)
                 ClockSkew = TimeSpan.Zero
-            }, out SecurityToken validatedToken);
+            }, out var validatedToken);
 
             var jwtToken = (JwtSecurityToken)validatedToken;
             var userId = int.Parse(jwtToken.Claims.First(x => x.Type == "id").Value);
@@ -99,7 +99,7 @@ public class JwtUtils : IJwtUtils
 
             if (!tokenIsUnique)
                 return getUniqueToken();
-            
+
             return token;
         }
     }

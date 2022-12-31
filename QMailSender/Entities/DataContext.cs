@@ -12,12 +12,12 @@ public class DataContext : DbContext
         Database.Migrate();
     }
 
+    public DbSet<User> Users => Set<User>();
+    public DbSet<Job> Jobs => Set<Job>();
+    public DbSet<JobMember> JobMembers => Set<JobMember>();
+
     protected override void OnConfiguring(DbContextOptionsBuilder options)
     {
         options.UseSqlite(Configuration.GetConnectionString("QMailSenderDatabase"));
     }
-
-    public DbSet<User> Users => Set<User>();
-    public DbSet<Job> Jobs => Set<Job>();
-    public DbSet<JobMember> JobMembers => Set<JobMember>();
 }

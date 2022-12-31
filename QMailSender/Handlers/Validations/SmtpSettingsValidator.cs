@@ -3,7 +3,7 @@ using QMailSender.Models;
 
 namespace QMailSender.Handlers.Validations;
 
-public class SmtpSettingsValidator : AbstractValidator<SmtpSettings> 
+public class SmtpSettingsValidator : AbstractValidator<SmtpSettings>
 {
     public SmtpSettingsValidator()
     {

@@ -1,11 +1,10 @@
-namespace QMailSender.Services;
-
-using BCrypt.Net;
 using Microsoft.Extensions.Options;
+using QMailSender.Authorization;
 using QMailSender.Entities;
 using QMailSender.Helpers;
 using QMailSender.Models.Users;
-using QMailSender.Authorization;
+
+namespace QMailSender.Services;
 
 public interface IUserService
 {
@@ -18,9 +17,9 @@ public interface IUserService
 
 public class UserService : IUserService
 {
-    private DataContext _context;
-    private IJwtUtils _jwtUtils;
     private readonly AppSettings _appSettings;
+    private readonly DataContext _context;
+    private readonly IJwtUtils _jwtUtils;
 
     public UserService(
         DataContext context,
@@ -37,7 +36,7 @@ public class UserService : IUserService
         var user = _context.Users.SingleOrDefault(x => x.Username == model.Username);
 
         // validate
-        if (user == null || !BCrypt.Verify(model.Password, user.PasswordHash))
+        if (user == null || !BCrypt.Net.BCrypt.Verify(model.Password, user.PasswordHash))
             throw new AppException("Username or password is incorrect");
 
         // authentication successful so generate jwt and refresh tokens
@@ -63,7 +62,8 @@ public class UserService : IUserService
         if (refreshToken.IsRevoked)
         {
             // revoke all descendant tokens in case this token has been compromised
-            revokeDescendantRefreshTokens(refreshToken, user, ipAddress, $"Attempted reuse of revoked ancestor token: {token}");
+            revokeDescendantRefreshTokens(refreshToken, user, ipAddress,
+                $"Attempted reuse of revoked ancestor token: {token}");
             _context.Update(user);
             _context.SaveChanges();
         }
@@ -136,15 +136,15 @@ public class UserService : IUserService
     private void removeOldRefreshTokens(User user)
     {
         // remove old inactive refresh tokens from user based on TTL in app settings
-        user.RefreshTokens.RemoveAll(x => 
-            !x.IsActive && 
+        user.RefreshTokens.RemoveAll(x =>
+            !x.IsActive &&
             x.Created.AddDays(_appSettings.RefreshTokenTTL) <= DateTime.UtcNow);
     }
 
     private void revokeDescendantRefreshTokens(RefreshToken refreshToken, User user, string ipAddress, string reason)
     {
         // recursively traverse the refresh token chain and ensure all descendants are revoked
-        if(!string.IsNullOrEmpty(refreshToken.ReplacedByToken))
+        if (!string.IsNullOrEmpty(refreshToken.ReplacedByToken))
         {
             var childToken = user.RefreshTokens.SingleOrDefault(x => x.Token == refreshToken.ReplacedByToken);
             if (childToken.IsActive)
@@ -154,7 +154,8 @@ public class UserService : IUserService
         }
     }
 
-    private void revokeRefreshToken(RefreshToken token, string ipAddress, string reason = null, string replacedByToken = null)
+    private void revokeRefreshToken(RefreshToken token, string ipAddress, string reason = null,
+        string replacedByToken = null)
     {
         token.Revoked = DateTime.UtcNow;
         token.RevokedByIp = ipAddress;

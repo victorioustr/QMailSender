@@ -4,7 +4,6 @@ using QMailSender.Handlers.Abstract;
 using QMailSender.Handlers.Concrete;
 using QMailSender.Models;
 using QMailSender.Services.QueueService;
-using IResult = Microsoft.AspNetCore.Http.IResult;
 
 namespace QMailSender.Handlers.Commands;
 
@@ -29,23 +28,23 @@ public class SendCommand : IRequest<IDataResult<SendResponse>>
             {
                 var sendRequest = request.SendRequest;
 
-                var job = new Job()
+                var job = new Job
                 {
                     Id = Guid.NewGuid(),
                     Request = sendRequest,
-                    Status = JobStatus.Waiting,
+                    Status = JobStatus.Waiting
                 };
 
                 _context.Jobs.Add(job);
                 await _context.SaveChangesAsync(cancellationToken);
 
-                var jobMembers = sendRequest.TargetAddresses.ToList().Select(s => new JobMember()
+                var jobMembers = sendRequest.TargetAddresses.ToList().Select(s => new JobMember
                 {
                     Id = Guid.NewGuid(),
                     JobId = job.Id,
                     Status = JobStatus.Waiting,
                     TargetAddress = s,
-                    QueueTime = DateTime.Now,
+                    QueueTime = DateTime.Now
                 }).ToList();
 
                 await _context.JobMembers.AddRangeAsync(jobMembers, cancellationToken);
@@ -60,7 +59,7 @@ public class SendCommand : IRequest<IDataResult<SendResponse>>
                     _taskQueue.QueueBackgroundWorkItemAsync(ct => Jobs.SendWorkAsync(f, cancellationToken));
                 });
 
-                var result = new SendResponse()
+                var result = new SendResponse
                 {
                     Count = jobMembers.Count,
                     JobId = job.Id

@@ -1,15 +1,14 @@
-namespace QMailSender.Entities;
-
-using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
+using Microsoft.EntityFrameworkCore;
+
+namespace QMailSender.Entities;
 
 [Owned]
 public class RefreshToken
 {
-    [Key]
-    [JsonIgnore]
-    public int Id { get; set; }
+    [Key] [JsonIgnore] public int Id { get; set; }
+
     public string? Token { get; set; }
     public DateTime Expires { get; set; }
     public DateTime Created { get; set; }

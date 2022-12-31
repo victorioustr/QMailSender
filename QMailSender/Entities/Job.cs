@@ -11,11 +11,11 @@ public class Job
     {
         JobMembers = new HashSet<JobMember>();
     }
-    
+
     public Guid Id { get; set; }
-    [JsonIgnore]
-    [Column("Request")]
-    public string RequestString { get; set; }
+
+    [JsonIgnore] [Column("Request")] public string RequestString { get; set; }
+
     public JobStatus Status { get; set; }
 
     [NotMapped]
@@ -26,19 +26,18 @@ public class Job
     }
 
     public virtual IEnumerable<JobMember> JobMembers { get; set; }
-    
-    [NotMapped]
-    public int? TotalMemberCount => JobMembers?.Count();
-    [NotMapped]
-    public int? QueuedMemberCount => JobMembers?.Count(c=>c.Status == JobStatus.Queued);
-    [NotMapped]
-    public int? RunningMemberCount => JobMembers?.Count(c=>c.Status == JobStatus.Running);
-    [NotMapped]
-    public int? FailedMemberCount => JobMembers?.Count(c=>c.Status == JobStatus.Failed);
-    [NotMapped]
-    public int? WaitingMemberCount => JobMembers?.Count(c=>c.Status == JobStatus.Waiting);
-    [NotMapped]
-    public int? FinishedMemberCount => JobMembers?.Count(c=>c.Status == JobStatus.Finished);
+
+    [NotMapped] public int? TotalMemberCount => JobMembers?.Count();
+
+    [NotMapped] public int? QueuedMemberCount => JobMembers?.Count(c => c.Status == JobStatus.Queued);
+
+    [NotMapped] public int? RunningMemberCount => JobMembers?.Count(c => c.Status == JobStatus.Running);
+
+    [NotMapped] public int? FailedMemberCount => JobMembers?.Count(c => c.Status == JobStatus.Failed);
+
+    [NotMapped] public int? WaitingMemberCount => JobMembers?.Count(c => c.Status == JobStatus.Waiting);
+
+    [NotMapped] public int? FinishedMemberCount => JobMembers?.Count(c => c.Status == JobStatus.Finished);
 }
 
 public enum JobStatus

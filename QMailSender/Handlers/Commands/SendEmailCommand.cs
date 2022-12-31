@@ -4,7 +4,6 @@ using MailKit.Security;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using MimeKit;
-using MimeKit.Encodings;
 using MimeKit.Text;
 using QMailSender.Entities;
 using QMailSender.Handlers.Concrete;
@@ -39,9 +38,7 @@ public class SendEmailCommand : IRequest<IResult>
                 .FirstOrDefault(w => w.Id == request.JobMember.Id);
 
             if (jobMember == null)
-            {
                 return new Result(false, $"JobMember Id : {request.JobMember.Id} job member not found");
-            }
 
             var job = jobMember.Job;
 
@@ -50,7 +47,6 @@ public class SendEmailCommand : IRequest<IResult>
                 return new Result(false, $"Job Id : {jobMember.JobId} job already finished or failed");
 
             if (job.Status is JobStatus.Waiting or JobStatus.Queued)
-            {
                 try
                 {
                     job.Status = JobStatus.Running;
@@ -64,10 +60,8 @@ public class SendEmailCommand : IRequest<IResult>
                         jobMember.JobId, jobMember.Id, jobMember.TargetAddress, e.Message);
                     return new Result(false, $"Job Id : {jobMember.JobId} job not found");
                 }
-            }
 
             if (jobMember.Status is JobStatus.Waiting or JobStatus.Queued)
-            {
                 try
                 {
                     jobMember.Status = JobStatus.Running;
@@ -82,19 +76,19 @@ public class SendEmailCommand : IRequest<IResult>
                         jobMember.JobId, jobMember.Id, jobMember.TargetAddress, e.Message);
                     return new Result(false, $"JobMember Id : {jobMember.Id} job member not found");
                 }
-            }
 
             try
             {
-                var email = new MimeMessage()
+                var email = new MimeMessage
                 {
                     Subject = job.Request.Subject,
-                    Body = new TextPart(TextFormat.Html) { Text = Encoding.UTF8.GetString(Convert.FromBase64String(job.Request.Base64Body)) },
+                    Body = new TextPart(TextFormat.Html)
+                        { Text = Encoding.UTF8.GetString(Convert.FromBase64String(job.Request.Base64Body)) }
                 };
                 email.From.Add(new MailboxAddress(job.Request.FromName, job.Request.FromAddress));
                 email.ReplyTo.Add(new MailboxAddress(job.Request.ReplyToName, job.Request.ReplyToAddress));
                 email.To.Add(MailboxAddress.Parse(jobMember.TargetAddress));
-                
+
                 if (!string.IsNullOrEmpty(job.Request.UnSubscribeUrl))
                     email.Headers.Add("List-Unsubscribe", job.Request.UnSubscribeUrl);
 

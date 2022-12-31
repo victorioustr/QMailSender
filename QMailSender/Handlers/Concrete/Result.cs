@@ -1,4 +1,3 @@
-using QMailSender.Handlers.Abstract;
 using IResult = QMailSender.Handlers.Abstract.IResult;
 
 namespace QMailSender.Handlers.Concrete;

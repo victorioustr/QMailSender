@@ -14,17 +14,17 @@ using QMailSender.Helpers;
 using QMailSender.Services;
 using QMailSender.Services.QueueService;
 
-var securityScheme = new OpenApiSecurityScheme()
+var securityScheme = new OpenApiSecurityScheme
 {
     Name = "Authorization",
     Type = SecuritySchemeType.ApiKey,
     Scheme = "Bearer",
     BearerFormat = "JWT",
     In = ParameterLocation.Header,
-    Description = "JSON Web Token based security",
+    Description = "JSON Web Token based security"
 };
 
-var securityReq = new OpenApiSecurityRequirement()
+var securityReq = new OpenApiSecurityRequirement
 {
     {
         new OpenApiSecurityScheme
@@ -39,20 +39,20 @@ var securityReq = new OpenApiSecurityRequirement()
     }
 };
 
-var contact = new OpenApiContact()
+var contact = new OpenApiContact
 {
     Name = "Muzaffer AKYIL",
     Email = "m.akyil@qt.net.tr",
     Url = new Uri("https://qt.net.tr")
 };
 
-var license = new OpenApiLicense()
+var license = new OpenApiLicense
 {
     Name = "Free License",
     Url = new Uri("https://qt.net.tr")
 };
 
-var info = new OpenApiInfo()
+var info = new OpenApiInfo
 {
     Version = "v1",
     Title = "QMailSender - Queueble Mail Sender API",
@@ -91,10 +91,7 @@ services.AddSwaggerGen(o =>
 services.AddHostedService<SenderWorker>();
 services.AddSingleton<IBackgroundTaskQueue>(_ =>
 {
-    if (!int.TryParse(builder.Configuration["QueueCapacity"], out var queueCapacity))
-    {
-        queueCapacity = 100;
-    }
+    if (!int.TryParse(builder.Configuration["QueueCapacity"], out var queueCapacity)) queueCapacity = 100;
 
     return new DefaultBackgroundTaskQueue(queueCapacity);
 });
@@ -110,7 +107,7 @@ using (var scope = app.Services.CreateScope())
     var appSettings = builder.Configuration
         .GetSection("AppSettings")
         .Get<AppSettings>();
-    
+
     if (!context.Users.Any())
     {
         var user = new User
@@ -149,4 +146,3 @@ app.MapControllers();
 Jobs.Configure(app.Services.GetService<IMediator>());
 
 app.Run();
-
